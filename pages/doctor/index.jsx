@@ -26,29 +26,17 @@ import {
 const getListData = (value) => {
     let listData
     switch (value.date()) {
-        case 8:
+        case 20:
             listData = [
                 {
-                    type: "success",
-                    content: "Examination",
-                    time: "5:30",
-                    link: "lmao",
-                },
-            ]
-            break
-        case 10:
-            listData = [
-                {
-                    type: "success",
-                    content: "Paracentesis",
-                    time: "2:00",
-                    link: "lmao2",
+                    content: "Coughing examination",
+                    time: "6:30",
+                    link: "link",
                 },
                 {
-                    type: "success",
-                    content: "Examination",
-                    time: "5:30",
-                    link: "lmao",
+                    content: "General medical checkup for nausea",
+                    time: "6:30",
+                    link: "link",
                 },
             ]
             break

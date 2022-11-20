@@ -8,26 +8,17 @@ import { getNextApt } from "../../lib/utils"
 const getListData = (value) => {
     let listData
     switch (value.date()) {
-        case 8:
+        case 20:
             listData = [
                 {
-                    content: "Examination",
-                    time: "5:30",
-                    link: "lmao",
-                },
-            ]
-            break
-        case 10:
-            listData = [
-                {
-                    content: "Jaw Checkup",
-                    time: "2:00",
-                    link: "lmao2",
+                    content: "Coughing examination",
+                    time: "6:30",
+                    link: "link",
                 },
                 {
-                    content: "Examination",
-                    time: "5:30",
-                    link: "lmao",
+                    content: "General medical checkup for nausea",
+                    time: "6:30",
+                    link: "link",
                 },
             ]
             break
@@ -103,7 +94,9 @@ export default function Patient() {
                             background: "#dcf1fa",
                         }}
                     >
-                        <h1>Next appointment on {nextApt.date} at {nextApt.time}</h1>
+                        <h1>
+                            Next appointment on {nextApt.date} at {nextApt.time}
+                        </h1>
                         <Link href="">
                             <Button type="primary">Join Now</Button>
                         </Link>
