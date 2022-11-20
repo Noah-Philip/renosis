@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react"
 import { Space, Button, Table, Modal, Tag } from "antd"
 import { Layout } from "../../components/Layout"
-import { getAppointmentsFor, getSubmissions } from "../../lib/utils"
+import {
+    getAppointmentsFor,
+    getSubmissions,
+    getFullNameById,
+} from "../../lib/utils"
 import { useFirebaseAuth } from "../../lib/auth-context"
 
 const MedHistory = () => {
@@ -24,11 +28,6 @@ const MedHistory = () => {
 
     const columns = [
         {
-            title: "Title",
-            dataIndex: "title",
-            key: "title",
-        },
-        {
             title: "Date",
             dataIndex: "date",
             key: "date",
@@ -44,7 +43,7 @@ const MedHistory = () => {
             render: (_, record) => (
                 <Button
                     onClick={() => {
-                        setCurrText(record.notes)
+                        setCurrText(record.description)
                         showModal()
                     }}
                 >
@@ -56,25 +55,28 @@ const MedHistory = () => {
             title: "Video Link",
             dataIndex: "video",
             key: "video",
-            render: (_, record) => <a href={record.video}>{record.video}</a>,
+            render: (_, record) => (
+                <a href={record.meetingLink}>{record.meetingLink}</a>
+            ),
         },
     ]
 
     useEffect(() => {
-        ; (async () => {
-            setData(
-                (await getAppointmentsFor(user)).map(
-                    ({ title, date, uid, submission, vid }) => ({
-                        title,
+        ;(async () => {
+            if (user) {
+                const meetings = (await getAppointmentsFor(user.uid))
+                    .filter((value) => JSON.stringify(value) !== "{}")
+                    .map(async ({ uid, date, meetingLink, submission }) => ({
                         date,
-                        description: submission.text,
-                        video: vid,
-                        doctor: getFullName(uid),
-                    })
-                )
-            )
+                        doctor: await getFullNameById(uid),
+                        description: submission.description,
+                        meetingLink,
+                    }))
+                setData(await Promise.all(meetings))
+                console.log(await Promise.all(meetings))
+            }
         })()
-    })
+    }, [user])
 
     return (
         <Layout>

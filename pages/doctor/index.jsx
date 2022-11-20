@@ -115,16 +115,11 @@ export default function Doctor() {
     const [currText, setCurrText] = useState("")
     const [date, setDate] = useState("")
     const [time, setTime] = useState("")
-    const [subData, setSubData] = useState("")
-    const [meetingData, setMeetingData] = useState("")
+    const [subData, setSubData] = useState([])
+    const [meetingData, setMeetingData] = useState([])
     const [meetingLink, setMeetingLink] = useState("")
 
     const meetingColumns = [
-        {
-            title: "Title",
-            dataIndex: "title",
-            key: "title",
-        },
         {
             title: "Date",
             dataIndex: "date",
@@ -146,11 +141,11 @@ export default function Doctor() {
     ]
 
     const subColumns = [
-        {
-            title: "Title",
-            dataIndex: "title",
-            key: "title",
-        },
+        // {
+        //     title: "Title",
+        //     dataIndex: "title",
+        //     key: "title",
+        // },
         {
             title: "Patient",
             dataIndex: "patient",
@@ -204,31 +199,37 @@ export default function Doctor() {
 
     useEffect(() => {
         ;(async () => {
-            console.log(await getAllSubmissions())
-            setSubData(
-                (await getAllSubmissions()).map(
-                    ({ title, date, time, uid, submission, vid }) => ({
-                        title,
-                        patient: getFullNameById(uid),
-                        date,
-                        time,
-                        description: submission.text,
-                        video: vid,
-                    })
-                )
-            )
-            setMeetingData(
-                (await getAppointmentsBy(user)).map(
-                    ({ title, date, meetingLink, submission }) => ({
-                        title,
-                        date,
-                        patient: getFullNameById(submission.uid),
-                        meetingLink,
-                    })
-                )
-            )
+            const subs = (await getAllSubmissions())
+                .filter((value) => JSON.stringify(value) !== "{}")
+                .map(async ({ date, text, time, uid, vid }) => ({
+                    patient: await getFullNameById(uid),
+                    date,
+                    time,
+                    description: text,
+                    video: vid.url,
+                }))
+            setSubData(await Promise.all(subs))
+
+            if (user) {
+                const meetings = (await getAppointmentsBy(user.uid))
+                    .filter((value) => JSON.stringify(value) !== "{}")
+                    .map(
+                        async ({
+                            date,
+                            meetingLink,
+                            submission,
+                            ...others
+                        }) => ({
+                            date,
+                            patient: submission.patient,
+                            meetingLink,
+                            ...others,
+                        })
+                    )
+                setMeetingData(await Promise.all(meetings))
+            }
         })()
-    })
+    }, [user])
 
     return (
         <Layout>
@@ -273,9 +274,9 @@ export default function Doctor() {
             >
                 <Input
                     placeholder="Google Meets link"
-                    onChange={(txt) => setMeetingLink(txt)}
+                    className="mb-4"
+                    onChange={(txt) => setMeetingLink(txt.target.value)}
                 />
-                ;
                 <div className="flex gap-2 mb-4">
                     <DatePicker
                         onChange={(date, dateString) => {
