@@ -37,24 +37,29 @@ export default function NewSubmission() {
     }
     return (
         <Layout>
-            <div>
+            <div className="container m-auto w-3/5 mt-12">
+                <h1>New Submission</h1>
                 <TextArea
                     rows={4}
                     onChange={(event) => setText(event.target.value)}
+                    className="mb-4"
                 />
-                <Dragger {...props}>
-                    <p className="ant-upload-drag-icon">
-                        <InboxOutlined />
-                    </p>
-                    <p className="ant-upload-text">
-                        Click or drag file to this area to upload
-                    </p>
-                    <p className="ant-upload-hint">
-                        Support for a single or bulk upload. Strictly prohibit
-                        from uploading company data or other band files
-                    </p>
-                </Dragger>
-                <div>
+                <div className="mb-4">
+                    <Dragger {...props}>
+                        <p className="ant-upload-drag-icon">
+                            <InboxOutlined />
+                        </p>
+                        <p className="ant-upload-text">
+                            Click or drag file to this area to upload
+                        </p>
+                        <p className="ant-upload-hint">
+                            Support for a single or bulk upload. Strictly
+                            prohibit from uploading company data or other band
+                            files
+                        </p>
+                    </Dragger>
+                </div>
+                <div className="flex gap-2 mb-4">
                     <DatePicker
                         onChange={(date, dateString) => {
                             setDate(dateString)

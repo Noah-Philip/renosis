@@ -58,6 +58,7 @@ const PatientCalendar = () => {
         <Calendar
             dateCellRender={dateCellRender}
             monthCellRender={monthCellRender}
+            className="rounded"
         />
     )
 }
@@ -65,24 +66,39 @@ const PatientCalendar = () => {
 export default function Patient() {
     return (
         <Layout>
-            <div>
+            <div className="p-4">
+                <Card
+                    style={{
+                        width: "100%",
+                        textAlign: "center",
+                        border: "1px solid #4BB543",
+                        background: "#e8fae8",
+                    }}
+                >
+                    <h1>Next appointment on 12/11/2023</h1>
+                </Card>
+            </div>
+            <div className="flex gap-2 my-5 m-auto justify-center">
                 <Link href="/patient/new-submission">
-                    <Card style={{ width: 200, textAlign: "center" }}>
+                    <Card
+                        style={{ width: 200, textAlign: "center" }}
+                        className="hover:opacity-80 hover:shadow transition-all"
+                    >
                         <h3>New Submission</h3>
                     </Card>
                 </Link>
                 <Link href="/patient/med-history">
-                    <Card style={{ width: 200, textAlign: "center" }}>
+                    <Card
+                        style={{ width: 200, textAlign: "center" }}
+                        className="hover:opacity-80 hover:shadow transition-all"
+                    >
                         <h3>View History</h3>
                     </Card>
                 </Link>
             </div>
-            <div>
-                <Card style={{ width: "100%", textAlign: "center" }}>
-                    <h1>Next appointment on 12/11/2023</h1>
-                </Card>
+            <div className="my-10 max-w-7xl m-auto">
+                <PatientCalendar />
             </div>
-            <PatientCalendar />
         </Layout>
     )
 }

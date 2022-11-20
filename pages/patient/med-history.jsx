@@ -44,7 +44,7 @@ const MedHistory = () => {
             key: "doctor",
         },
         {
-            title: "View",
+            title: "Notes",
             key: "view",
             render: (_, record) => (
                 <Button
@@ -60,7 +60,10 @@ const MedHistory = () => {
     ]
     return (
         <Layout>
-            <Table columns={columns} dataSource={data} />;
+            <div className="m-16">
+                <h1>Medical History</h1>
+                <Table columns={columns} dataSource={data} />;
+            </div>
             <Modal
                 title="Basic Modal"
                 open={isModalOpen}
@@ -72,7 +75,6 @@ const MedHistory = () => {
         </Layout>
     )
 }
-
 
 export async function getStaticProps(context) {
     return {
