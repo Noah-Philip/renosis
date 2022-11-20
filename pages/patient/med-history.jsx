@@ -73,7 +73,6 @@ const MedHistory = () => {
                         meetingLink,
                     }))
                 setData(await Promise.all(meetings))
-                console.log(await Promise.all(meetings))
             }
         })()
     }, [user])

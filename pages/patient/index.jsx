@@ -2,7 +2,8 @@ import { Layout } from "../../components/Layout"
 import { Card } from "antd"
 import { Badge, Modal, Tag, Calendar, Button } from "antd"
 import Link from "next/link"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { getNextApt } from "../../lib/utils"
 
 const getListData = (value) => {
     let listData
@@ -84,22 +85,33 @@ const PatientCalendar = () => {
 }
 
 export default function Patient() {
+    const [nextApt, setNextApt] = useState({})
+    useEffect(() => {
+        ;(async () => {
+            const apt = await getNextApt()
+            setNextApt(apt)
+        })()
+    })
     return (
         <Layout>
-            <div className="p-4">
-                <Card
-                    style={{
-                        width: "100%",
-                        textAlign: "center",
-                        background: "#dcf1fa",
-                    }}
-                >
-                    <h1>Next appointment on 12/11/2023 at 5:30 PM</h1>
-                    <Link href="">
-                        <Button type="primary">Join Now</Button>
-                    </Link>
-                </Card>
-            </div>
+            {nextApt ? (
+                <div className="p-4">
+                    <Card
+                        style={{
+                            width: "100%",
+                            textAlign: "center",
+                            background: "#dcf1fa",
+                        }}
+                    >
+                        <h1>Next appointment on {nextApt.date} at {nextApt.time}</h1>
+                        <Link href="">
+                            <Button type="primary">Join Now</Button>
+                        </Link>
+                    </Card>
+                </div>
+            ) : (
+                <></>
+            )}
             <div className="flex gap-2 my-5 m-auto justify-center">
                 <Link href="/patient/new-submission">
                     <Card
