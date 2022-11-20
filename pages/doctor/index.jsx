@@ -28,7 +28,7 @@ const getListData = (value) => {
             listData = [
                 {
                     type: "success",
-                    content: "Teeth cleaning",
+                    content: "Paracentesis",
                     time: "2:00",
                     link: "lmao2",
                 },
@@ -129,7 +129,7 @@ export default function Doctor() {
 
     const meetingData = [
         {
-            title: "Teeth Checkup",
+            title: "Paracentesis",
             date: "12/11/2023",
             patient: "Raj",
             meetingLink: "https://meeting.link.com/13409",
@@ -200,7 +200,7 @@ export default function Doctor() {
             date: "12/11/2023",
             time: "5:00 PM",
             video: "https://video.link/13ha29e",
-            description: "Slight vomiting sensation...",
+            description: "Pt. presents with a slight vomiting sensation almost every morning...",
         },
     ]
 

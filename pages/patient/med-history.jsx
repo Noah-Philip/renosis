@@ -4,10 +4,10 @@ import { Layout } from "../../components/Layout"
 
 const data = [
     {
-        title: "Teeth Checkup",
+        title: "Jaw Assessment",
         date: "12/11/2023",
         doctor: "Dr. Raj",
-        notes: "Ok so looks like he is experiencing some mild difficulty with chewing...",
+        notes: "More commonly occurring headaches and jaw tenderness, possible temporomandibular joint dysfunction...",
         video: "https://video.lol.lmfao.com/090fja8",
     },
 ]

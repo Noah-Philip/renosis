@@ -22,9 +22,8 @@ export const Navbar = () => {
                         <Link href={`/${role}`}>
                             <img
                                 src="/images/Renosis_Logo.png"
-                                alt=""
+                                alt="Logo"
                                 height="50"
-                                align="center"
                             />
                         </Link>
                     </div>
