@@ -15,7 +15,7 @@ export const Navbar = () => {
     const [role, setRole] = useState("")
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const role = await getUserRole(user)
             setRole(role)
         })()
@@ -29,8 +29,9 @@ export const Navbar = () => {
                         <Link href={`/${role}`}>
                             <img
                                 src="/images/Renosis_Logo.png"
-                                alt="Logo"
+                                alt=""
                                 height="50"
+                                align="center"
                             />
                         </Link>
                     </div>
@@ -41,10 +42,10 @@ export const Navbar = () => {
                                 <Button
                                     onClick={() => {
                                         auth.signOut()
-                                            .then(function () {
+                                            .then(function() {
                                                 Router.push("/login")
                                             })
-                                            .catch(function (error) {
+                                            .catch(function(error) {
                                                 console.log(error)
                                             })
                                     }}

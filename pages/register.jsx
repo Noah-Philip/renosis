@@ -13,15 +13,17 @@ export const Register = () => {
     const auth = getAuth(app)
 
     const onFinish = (values) => {
-        const { email, password, firstname, lastname, role } = values
+        const { email, password, phone, firstname, lastname, role } = values
         createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 // Signed in
                 const user = userCredential.user
                 await setDoc(doc(db, "userInfo", user.uid), {
                     role,
+                    email,
                     firstname,
                     lastname,
+                    phone,
                 })
                 Router.push(`/${role}`)
             })
@@ -89,6 +91,19 @@ export const Register = () => {
                         {
                             required: true,
                             message: "Please input your email!",
+                        },
+                    ]}
+                >
+                    <Input />
+                </Form.Item>
+
+                <Form.Item
+                    label="Phone Number"
+                    name="phone"
+                    rules={[
+                        {
+                            required: true,
+                            message: "Please input your phone!",
                         },
                     ]}
                 >

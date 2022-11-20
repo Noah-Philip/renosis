@@ -78,7 +78,7 @@ const PatientCalendar = () => {
 export default function Patient() {
     const [nextApt, setNextApt] = useState({})
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const apt = await getNextApt()
             setNextApt(apt)
         })()

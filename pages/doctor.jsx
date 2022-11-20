@@ -19,8 +19,9 @@ import { initializeApp } from "firebase/app"
 import {
     getAllSubmissions,
     getAppointmentsBy,
-    getFullName,
     getFullNameById,
+    textTo,
+    getPhoneNumber,
 } from "../../lib/utils"
 
 const getListData = (value) => {
@@ -186,10 +187,11 @@ export default function Doctor() {
     ]
 
     useEffect(() => {
-        ;(async () => {
+        ; (async () => {
             const subs = (await getAllSubmissions())
                 .filter((value) => JSON.stringify(value) !== "{}")
                 .map(async ({ date, text, time, uid, vid }) => ({
+                    uid,
                     patient: await getFullNameById(uid),
                     date,
                     time,
@@ -257,6 +259,10 @@ export default function Doctor() {
                     }
                     await setDoc(doc(db, "appointments", id), obj)
                     setIsScheduleModalOpen(false)
+                    await textTo(
+                        await getPhoneNumber(currRecord.uid),
+                        `Renosis Reminder: Appointment scheduled for ${date} at ${time}. Meeting link: ${meetingLink}`
+                    )
                 }}
                 onCancel={() => setIsScheduleModalOpen(false)}
             >
