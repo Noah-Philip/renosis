@@ -5,6 +5,7 @@ import { initializeApp } from "firebase/app"
 import { getFirestore, doc, addDoc, setDoc } from "firebase/firestore"
 import { Layout } from "../components/Layout"
 import { firebaseConfig } from "../lib/config"
+import Router from "next/router"
 
 export const Register = () => {
     const app = initializeApp(firebaseConfig)
@@ -22,6 +23,7 @@ export const Register = () => {
                     firstname,
                     lastname,
                 })
+                Router.push(`/${role}`)
             })
             .catch((error) => {
                 const errorCode = error.code
@@ -39,6 +41,8 @@ export const Register = () => {
         <Layout>
             <Form
                 name="basic"
+                className="mx-auto pl-40 mt-20"
+                style={{ width: "80rem" }}
                 labelCol={{
                     span: 8,
                 }}
