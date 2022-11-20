@@ -5,7 +5,7 @@ export const Navbar = () => {
 
     return (
         <div className="bg-white shadow">
-            <div className="container px-4">
+            <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between py-4">
                     <div></div>
 
@@ -17,6 +17,7 @@ export const Navbar = () => {
                         </div>
                     ) : (
                         <div className="hidden sm:flex sm:items-center">
+                            <img src="/images/Renosis_Logo.png" alt="" height = "50" align = "center"/>
                             <a
                                 href="/login"
                                 className="text-gray-800 text-lg font-semibold hover:text-blue-600 mr-4"
