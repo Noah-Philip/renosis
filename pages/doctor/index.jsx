@@ -4,11 +4,12 @@ import {
     Table,
     Button,
     Modal,
+    Tag,
     Calendar,
-    Badge,
     DatePicker,
     TimePicker,
 } from "antd"
+import Link from "next/link"
 
 const getListData = (value) => {
     let listData
@@ -18,6 +19,8 @@ const getListData = (value) => {
                 {
                     type: "success",
                     content: "Examination",
+                    time: "5:30",
+                    link: "lmao",
                 },
             ]
             break
@@ -26,6 +29,14 @@ const getListData = (value) => {
                 {
                     type: "success",
                     content: "Teeth cleaning",
+                    time: "2:00",
+                    link: "lmao2",
+                },
+                {
+                    type: "success",
+                    content: "Examination",
+                    time: "5:30",
+                    link: "lmao",
                 },
             ]
             break
@@ -34,39 +45,51 @@ const getListData = (value) => {
     return listData || []
 }
 
-const getMonthData = (value) => {
-    if (value.month() === 8) {
-        return 1394
-    }
-}
 const DoctorCalendar = () => {
-    const monthCellRender = (value) => {
-        const num = getMonthData(value)
-        return num ? (
-            <div className="notes-month">
-                <section>{num}</section>
-                <span>Backlog number</span>
-            </div>
-        ) : null
-    }
+    const [isModalOpen, setIsModalOpen] = useState(false)
+    const [events, setEvents] = useState([])
+
     const dateCellRender = (value) => {
         const listData = getListData(value)
         return (
-            <ul className="events">
+            <ul
+                className="events p-0 flex flex-col gap-1"
+                onClick={() => {
+                    setEvents(listData)
+                    setIsModalOpen(true)
+                }}
+            >
                 {listData.map((item) => (
-                    <li key={item.content}>
-                        <Badge status={item.type} text={item.content} />
+                    <li key={item.content} className="">
+                        <Tag color="blue">{item.content}</Tag>
                     </li>
                 ))}
             </ul>
         )
     }
     return (
-        <Calendar
-            dateCellRender={dateCellRender}
-            monthCellRender={monthCellRender}
-            className="rounded"
-        />
+        <>
+            <Calendar dateCellRender={dateCellRender} className="rounded" />
+            <Modal
+                title="Appointments"
+                open={isModalOpen}
+                onOk={() => setIsModalOpen(false)}
+                onCancel={() => setIsModalOpen(false)}
+            >
+                <ul className="flex flex-col gap-2">
+                    {events.map((item) => (
+                        <li key={item.content}>
+                            <p className="mb-2">
+                                {item.content} at {item.time}
+                            </p>
+                            <Link href={item.link}>
+                                <Button type="primary">Join Now</Button>
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
+            </Modal>
+        </>
     )
 }
 
@@ -196,7 +219,7 @@ export default function Doctor() {
                 <DoctorCalendar />
             </div>
             <Modal
-                title="Basic Modal"
+                title="Description"
                 open={isDescModalOpen}
                 onOk={() => setIsDescModalOpen(false)}
                 onCancel={() => setIsDescModalOpen(false)}
@@ -204,7 +227,7 @@ export default function Doctor() {
                 <p>{currText}</p>
             </Modal>
             <Modal
-                title="Basic Modal"
+                title="Schedule Appointment"
                 open={isScheduleModalOpen}
                 onOk={() => {
                     // submit

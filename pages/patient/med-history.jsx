@@ -8,6 +8,7 @@ const data = [
         date: "12/11/2023",
         doctor: "Dr. Raj",
         notes: "Ok so looks like he is experiencing some mild difficulty with chewing...",
+        video: "https://video.lol.lmfao.com/090fja8",
     },
 ]
 
@@ -57,15 +58,21 @@ const MedHistory = () => {
                 </Button>
             ),
         },
+        {
+            title: "Video Link",
+            dataIndex: "video",
+            key: "video",
+            render: (_, record) => <a href={record.video}>{record.video}</a>,
+        },
     ]
     return (
         <Layout>
             <div className="m-16">
                 <h1>Medical History</h1>
-                <Table columns={columns} dataSource={data} />;
+                <Table columns={columns} dataSource={data} />
             </div>
             <Modal
-                title="Basic Modal"
+                title="Doctor Notes"
                 open={isModalOpen}
                 onOk={handleOk}
                 onCancel={handleCancel}

@@ -1,13 +1,33 @@
 import { useFirebaseAuth } from "../lib/auth-context"
+import { getUserRole } from "../lib/utils"
+import Link from "next/link"
+import { useEffect, useState } from "react"
 
 export const Navbar = () => {
     const user = useFirebaseAuth()
+    const [role, setRole] = useState("")
+
+    useEffect(() => {
+        ;(async () => {
+            const role = await getUserRole(user)
+            setRole(role)
+        })()
+    }, [user])
 
     return (
         <div className="bg-white shadow">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between py-4">
-                    <div></div>
+                    <div>
+                        <Link href={`/${role}`}>
+                            <img
+                                src="/images/Renosis_Logo.png"
+                                alt=""
+                                height="50"
+                                align="center"
+                            />
+                        </Link>
+                    </div>
 
                     {user !== null ? (
                         <div className="hidden sm:flex sm:items-center">
@@ -17,7 +37,6 @@ export const Navbar = () => {
                         </div>
                     ) : (
                         <div className="hidden sm:flex sm:items-center">
-                            <img src="/images/Renosis_Logo.png" alt="" height = "50" align = "center"/>
                             <a
                                 href="/login"
                                 className="text-gray-800 text-lg font-semibold hover:text-blue-600 mr-4"

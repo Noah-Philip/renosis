@@ -41,6 +41,7 @@ export default function NewSubmission() {
                 <h1>New Submission</h1>
                 <TextArea
                     rows={4}
+                    placeholder="Enter a short description of your video and symptoms here"
                     onChange={(event) => setText(event.target.value)}
                     className="mb-4"
                 />
@@ -53,19 +54,20 @@ export default function NewSubmission() {
                             Click or drag file to this area to upload
                         </p>
                         <p className="ant-upload-hint">
-                            Support for a single or bulk upload. Strictly
-                            prohibit from uploading company data or other band
-                            files
+                            Upload a valid video file with a thorough
+                            description of your symptoms, conditions, etc.
                         </p>
                     </Dragger>
                 </div>
                 <div className="flex gap-2 mb-4">
                     <DatePicker
+                        placeholder="Preferred Date"
                         onChange={(date, dateString) => {
                             setDate(dateString)
                         }}
                     />
                     <TimePicker
+                        placeholder="Preferred Time"
                         onChange={(time, timeString) => {
                             setTime(timeString)
                         }}
