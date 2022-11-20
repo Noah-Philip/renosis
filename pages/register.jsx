@@ -12,13 +12,15 @@ export const Register = () => {
     const auth = getAuth(app)
 
     const onFinish = (values) => {
-        const { email, password, role } = values
+        const { email, password, firstname, lastname, role } = values
         createUserWithEmailAndPassword(auth, email, password)
             .then(async (userCredential) => {
                 // Signed in
                 const user = userCredential.user
                 await setDoc(doc(db, "userInfo", user.uid), {
                     role,
+                    firstname,
+                    lastname,
                 })
             })
             .catch((error) => {

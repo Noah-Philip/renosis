@@ -10,6 +10,11 @@ import {
     TimePicker,
 } from "antd"
 import Link from "next/link"
+import { v4 as uuidv4 } from "uuid"
+import { useFirebaseAuth } from "../../lib/auth-context"
+import { getFirestore, doc, setDoc } from "firebase/firestore"
+import { firebaseConfig } from "../../lib/config"
+import { initializeApp } from "firebase/app"
 
 const getListData = (value) => {
     let listData
@@ -94,6 +99,9 @@ const DoctorCalendar = () => {
 }
 
 export default function Doctor() {
+    const user = useFirebaseAuth()
+    const app = initializeApp(firebaseConfig)
+    const db = getFirestore(app)
     const [isDescModalOpen, setIsDescModalOpen] = useState(false)
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
     const [currRecord, setCurrRecord] = useState({})
@@ -229,8 +237,17 @@ export default function Doctor() {
             <Modal
                 title="Schedule Appointment"
                 open={isScheduleModalOpen}
-                onOk={() => {
+                onOk={async () => {
                     // submit
+                    const id = uuidv4()
+                    const obj = {
+                        id,
+                        uid: user.uid,
+                        submission: currRecord,
+                        date,
+                        time,
+                    }
+                    await setDoc(doc(db, "appointments", id), obj)
                     setIsScheduleModalOpen(false)
                 }}
                 onCancel={() => setIsScheduleModalOpen(false)}

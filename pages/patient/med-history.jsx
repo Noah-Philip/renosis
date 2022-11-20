@@ -1,20 +1,14 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Space, Button, Table, Modal, Tag } from "antd"
 import { Layout } from "../../components/Layout"
-
-const data = [
-    {
-        title: "Teeth Checkup",
-        date: "12/11/2023",
-        doctor: "Dr. Raj",
-        notes: "Ok so looks like he is experiencing some mild difficulty with chewing...",
-        video: "https://video.lol.lmfao.com/090fja8",
-    },
-]
+import { getAppointmentsFor, getSubmissions } from "../../lib/utils"
+import { useFirebaseAuth } from "../../lib/auth-context"
 
 const MedHistory = () => {
+    const user = useFirebaseAuth()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [currText, setCurrText] = useState("")
+    const [data, setData] = useState([])
 
     const showModal = () => {
         setIsModalOpen(true)
@@ -65,6 +59,23 @@ const MedHistory = () => {
             render: (_, record) => <a href={record.video}>{record.video}</a>,
         },
     ]
+
+    useEffect(() => {
+        ; (async () => {
+            setData(
+                (await getAppointmentsFor(user)).map(
+                    ({ title, date, uid, submission, vid }) => ({
+                        title,
+                        date,
+                        description: submission.text,
+                        video: vid,
+                        doctor: getFullName(uid),
+                    })
+                )
+            )
+        })()
+    })
+
     return (
         <Layout>
             <div className="m-16">

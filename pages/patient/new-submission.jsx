@@ -98,6 +98,7 @@ export default function NewSubmission() {
                         const now = new Date()
                         const obj = {
                             uid: user.uid,
+                            id: vid.name,
                             vid,
                             text,
                             date,
