@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Layout } from "../../components/Layout"
 import {
     Table,
@@ -8,6 +8,7 @@ import {
     Calendar,
     DatePicker,
     TimePicker,
+    Input,
 } from "antd"
 import Link from "next/link"
 import { v4 as uuidv4 } from "uuid"
@@ -15,6 +16,12 @@ import { useFirebaseAuth } from "../../lib/auth-context"
 import { getFirestore, doc, setDoc } from "firebase/firestore"
 import { firebaseConfig } from "../../lib/config"
 import { initializeApp } from "firebase/app"
+import {
+    getAllSubmissions,
+    getAppointmentsBy,
+    getFullName,
+    getFullNameById,
+} from "../../lib/utils"
 
 const getListData = (value) => {
     let listData
@@ -108,6 +115,9 @@ export default function Doctor() {
     const [currText, setCurrText] = useState("")
     const [date, setDate] = useState("")
     const [time, setTime] = useState("")
+    const [subData, setSubData] = useState("")
+    const [meetingData, setMeetingData] = useState("")
+    const [meetingLink, setMeetingLink] = useState("")
 
     const meetingColumns = [
         {
@@ -132,15 +142,6 @@ export default function Doctor() {
             render: (_, record) => (
                 <a href={record.meetingLink}>{record.meetingLink}</a>
             ),
-        },
-    ]
-
-    const meetingData = [
-        {
-            title: "Teeth Checkup",
-            date: "12/11/2023",
-            patient: "Raj",
-            meetingLink: "https://meeting.link.com/13409",
         },
     ]
 
@@ -201,16 +202,33 @@ export default function Doctor() {
         },
     ]
 
-    const subData = [
-        {
-            title: "Cholestrol Checkup",
-            patient: "Sid",
-            date: "12/11/2023",
-            time: "5:00 PM",
-            video: "https://video.link/13ha29e",
-            description: "Slight vomiting sensation...",
-        },
-    ]
+    useEffect(() => {
+        ;(async () => {
+            console.log(await getAllSubmissions())
+            setSubData(
+                (await getAllSubmissions()).map(
+                    ({ title, date, time, uid, submission, vid }) => ({
+                        title,
+                        patient: getFullNameById(uid),
+                        date,
+                        time,
+                        description: submission.text,
+                        video: vid,
+                    })
+                )
+            )
+            setMeetingData(
+                (await getAppointmentsBy(user)).map(
+                    ({ title, date, meetingLink, submission }) => ({
+                        title,
+                        date,
+                        patient: getFullNameById(submission.uid),
+                        meetingLink,
+                    })
+                )
+            )
+        })()
+    })
 
     return (
         <Layout>
@@ -246,12 +264,18 @@ export default function Doctor() {
                         submission: currRecord,
                         date,
                         time,
+                        meetingLink,
                     }
                     await setDoc(doc(db, "appointments", id), obj)
                     setIsScheduleModalOpen(false)
                 }}
                 onCancel={() => setIsScheduleModalOpen(false)}
             >
+                <Input
+                    placeholder="Google Meets link"
+                    onChange={(txt) => setMeetingLink(txt)}
+                />
+                ;
                 <div className="flex gap-2 mb-4">
                     <DatePicker
                         onChange={(date, dateString) => {
