@@ -19,7 +19,7 @@ const getListData = (value) => {
         case 10:
             listData = [
                 {
-                    content: "Teeth cleaning",
+                    content: "Jaw Checkup",
                     time: "2:00",
                     link: "lmao2",
                 },
