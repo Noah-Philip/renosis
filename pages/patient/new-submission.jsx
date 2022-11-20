@@ -3,19 +3,28 @@ import { InboxOutlined } from "@ant-design/icons"
 import { message, Upload, DatePicker, TimePicker, Button } from "antd"
 import { useState } from "react"
 import { Input } from "antd"
+import { initializeApp } from "firebase/app"
+import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import { getFirestore, doc, addDoc, setDoc } from "firebase/firestore"
+import { v4 as uuidv4 } from "uuid"
+import { useFirebaseAuth } from "../../lib/auth-context"
+import { firebaseConfig } from "../../lib/config"
 
 const { TextArea } = Input
 const { Dragger } = Upload
 
 export default function NewSubmission() {
-    const [vid, setVid] = useState(null)
+    const user = useFirebaseAuth()
+    const app = initializeApp(firebaseConfig)
+    const db = getFirestore(app)
+    const [vid, setVid] = useState({})
     const [text, setText] = useState("")
     const [date, setDate] = useState("")
     const [time, setTime] = useState("")
 
     const props = {
         name: "file",
-        multiple: true,
+        multiple: false,
         accept: "video/*",
         onChange(info) {
             const { status } = info.file
@@ -29,7 +38,17 @@ export default function NewSubmission() {
             }
         },
         beforeUpload(file) {
-            setVid(file)
+            const storage = getStorage()
+            const uuid = uuidv4()
+            const storageRef = ref(storage, uuid)
+
+            uploadBytes(storageRef, file).then((snapshot) => {
+                getDownloadURL(snapshot.ref).then((url) => {
+                    setVid({ url, name: uuid })
+                })
+            })
+
+            return false
         },
         onDrop(e) {
             console.log("Dropped files", e.dataTransfer.files)
@@ -75,9 +94,19 @@ export default function NewSubmission() {
                 </div>
                 <Button
                     type="primary"
-                    onClick={() => {
-                        // submit here
-                        console.log(vid, text, date, time)
+                    onClick={async () => {
+                        const now = new Date()
+                        const obj = {
+                            uid: user.uid,
+                            id: vid.name,
+                            vid,
+                            text,
+                            date,
+                            time,
+                            createdAt: now,
+                        }
+                        console.log(obj)
+                        await setDoc(doc(db, "submissions", vid.name), obj)
                     }}
                 >
                     Submit

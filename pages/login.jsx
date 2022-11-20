@@ -4,6 +4,8 @@ import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 import { Layout } from "../components/Layout"
 import { firebaseConfig } from "../lib/config"
+import Router from "next/router"
+import { getUserRole } from "../lib/utils"
 
 export const Login = () => {
     const app = initializeApp(firebaseConfig)
@@ -12,11 +14,10 @@ export const Login = () => {
     const onFinish = (values) => {
         const { email, password } = values
         signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
+            .then(async (userCredential) => {
                 // Signed in
                 const user = userCredential.user
-                console.log(user)
-                // ...
+                Router.push(`/${await getUserRole(user)}`)
             })
             .catch((error) => {
                 const errorCode = error.code
@@ -33,11 +34,10 @@ export const Login = () => {
         <Layout>
             <Form
                 name="basic"
+                className="mx-auto pr-20 mt-20"
+                style={{ width: "30rem" }}
                 labelCol={{
                     span: 8,
-                }}
-                wrapperCol={{
-                    span: 6,
                 }}
                 initialValues={{
                     remember: true,

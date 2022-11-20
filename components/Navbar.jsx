@@ -2,9 +2,16 @@ import { useFirebaseAuth } from "../lib/auth-context"
 import { getUserRole } from "../lib/utils"
 import Link from "next/link"
 import { useEffect, useState } from "react"
+import { Button } from "antd"
+import { initializeApp } from "firebase/app"
+import { getAuth } from "firebase/auth"
+import { firebaseConfig } from "../lib/config"
+import Router from "next/router"
 
 export const Navbar = () => {
     const user = useFirebaseAuth()
+    const app = initializeApp(firebaseConfig)
+    const auth = getAuth(app)
     const [role, setRole] = useState("")
 
     useEffect(() => {
@@ -30,8 +37,20 @@ export const Navbar = () => {
 
                     {user !== null ? (
                         <div className="hidden sm:flex sm:items-center">
-                            <a className="text-gray-800 text-lg font-semibold border px-4 py-2 rounded-lg hover:text-blue-600 hover:border-blue-600">
-                                Log Out
+                            <a className="text-gray-800 text-lg font-semibold border px-4 py-2">
+                                <Button
+                                    onClick={() => {
+                                        auth.signOut()
+                                            .then(function () {
+                                                Router.push("/login")
+                                            })
+                                            .catch(function (error) {
+                                                console.log(error)
+                                            })
+                                    }}
+                                >
+                                    Log Out
+                                </Button>
                             </a>
                         </div>
                     ) : (
