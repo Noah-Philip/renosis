@@ -1,5 +1,5 @@
-import React from "react"
-import { Button, Checkbox, Radio, Form, Input } from "antd"
+import React, { useCallback, useState } from "react"
+import { Button, Select, Option, Radio, Form, Input } from "antd"
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 import { getFirestore, doc, addDoc, setDoc } from "firebase/firestore"
@@ -30,7 +30,6 @@ export const Register = () => {
             .catch((error) => {
                 const errorCode = error.code
                 const errorMessage = error.message
-
                 console.error(error)
             })
     }
@@ -90,6 +89,7 @@ export const Register = () => {
                     rules={[
                         {
                             required: true,
+                            email: true,
                             message: "Please input your email!",
                         },
                     ]}
@@ -98,13 +98,17 @@ export const Register = () => {
                 </Form.Item>
 
                 <Form.Item
-                    label="Phone Number"
                     name="phone"
+                    label="Phone Number"
                     rules={[
                         {
                             required: true,
-                            message: "Please input your phone!",
+                            message: "Please input your phone number!",
                         },
+                        {
+                            pattern: /^\+?[1-9]\d{1,14}$/,
+                            message: "Must be in E.164 format"
+                        }
                     ]}
                 >
                     <Input />
@@ -118,6 +122,10 @@ export const Register = () => {
                             required: true,
                             message: "Please input your password!",
                         },
+                        {
+                            min: 6,
+                            message: "Must have a minimum of 6 characters"
+                        },
                     ]}
                 >
                     <Input.Password />
@@ -126,11 +134,21 @@ export const Register = () => {
                 <Form.Item
                     label="Confirm Password"
                     name="confirmpassword"
+                    dependencies={['password']}
+                    hasFeedback
                     rules={[
                         {
                             required: true,
-                            message: "Please confirm your password!",
+                            message: 'Please confirm your password!',
                         },
+                        ({ getFieldValue }) => ({
+                            validator(_, value) {
+                                if (!value || getFieldValue('password') === value) {
+                                    return Promise.resolve();
+                                }
+                                return Promise.reject(new Error("Passwords don't match!"));
+                            },
+                        }),
                     ]}
                 >
                     <Input.Password />
@@ -142,7 +160,7 @@ export const Register = () => {
                     rules={[
                         {
                             required: true,
-                            message: "Please input your role!",
+                            message: "Must choose a role!",
                         },
                     ]}
                 >

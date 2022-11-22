@@ -44,7 +44,6 @@ export const Login = () => {
                 }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
-                autoComplete="off"
             >
                 <Form.Item
                     label="Email"
@@ -52,7 +51,8 @@ export const Login = () => {
                     rules={[
                         {
                             required: true,
-                            message: "Please input your email!",
+                            type: "email",
+                            message: "Please input a valid email!",
                         },
                     ]}
                 >
