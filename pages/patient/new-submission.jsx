@@ -4,7 +4,13 @@ import { message, Upload, DatePicker, TimePicker, Button } from "antd"
 import { useState } from "react"
 import { Input } from "antd"
 import { initializeApp } from "firebase/app"
-import { getStorage, getDownloadURL, ref, uploadBytes } from "firebase/storage"
+import {
+    getStorage,
+    getDownloadURL,
+    ref,
+    uploadBytes,
+    uploadBytesResumable,
+} from "firebase/storage"
 import { getFirestore, doc, addDoc, setDoc } from "firebase/firestore"
 import { v4 as uuidv4 } from "uuid"
 import { useFirebaseAuth } from "../../lib/auth-context"
@@ -21,6 +27,7 @@ export default function NewSubmission() {
     const [text, setText] = useState("")
     const [date, setDate] = useState("")
     const [time, setTime] = useState("")
+    const [progress, setProgress] = useState([])
 
     const props = {
         name: "file",
@@ -28,9 +35,6 @@ export default function NewSubmission() {
         accept: "video/*",
         onChange(info) {
             const { status } = info.file
-            if (status !== "uploading") {
-                console.log(info.file, info.fileList)
-            }
             if (status === "done") {
                 message.success(`${info.file.name} file uploaded successfully.`)
             } else if (status === "error") {
@@ -42,12 +46,32 @@ export default function NewSubmission() {
             const uuid = uuidv4()
             const storageRef = ref(storage, uuid)
 
-            uploadBytes(storageRef, file).then((snapshot) => {
-                getDownloadURL(snapshot.ref).then((url) => {
-                    setVid({ url, name: uuid })
-                })
-            })
-
+            const task = uploadBytesResumable(storageRef, file)
+            task.on(
+                "state_changed",
+                (snapshot) => {
+                    const p = Math.round(
+                        (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+                    )
+                    setProgress([
+                        {
+                            name: file.name,
+                            percent: p,
+                            uid: file.uid,
+                            status: p === 100 ? "success" : "uploading",
+                        },
+                    ])
+                },
+                (error) => {
+                    console.error(error)
+                },
+                () => {
+                    console.log(progress)
+                    getDownloadURL(task.snapshot.ref).then((url) => {
+                        setVid({ url, name: uuid })
+                    })
+                }
+            )
             return false
         },
         onDrop(e) {
@@ -65,7 +89,7 @@ export default function NewSubmission() {
                     className="mb-4"
                 />
                 <div className="mb-4">
-                    <Dragger {...props}>
+                    <Dragger {...{ ...props, fileList: progress }}>
                         <p className="ant-upload-drag-icon">
                             <InboxOutlined />
                         </p>
@@ -94,6 +118,7 @@ export default function NewSubmission() {
                 </div>
                 <Button
                     type="primary"
+                    disabled={!("name" in vid)}
                     onClick={async () => {
                         const now = new Date()
                         const obj = {
@@ -105,6 +130,7 @@ export default function NewSubmission() {
                             time,
                             createdAt: now,
                         }
+                        console.log(obj)
                         await setDoc(doc(db, "submissions", vid.name), obj)
                     }}
                 >

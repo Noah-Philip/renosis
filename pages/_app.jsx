@@ -1,7 +1,6 @@
 import { FirebaseAuthProvider } from "../lib/auth-context"
 import React from "react"
 import "../styles/globals.css"
-import 'antd/dist/reset.css';
 /* import Router from "next/router"
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from "../lib/config"
