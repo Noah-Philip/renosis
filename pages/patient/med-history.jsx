@@ -62,10 +62,11 @@ const MedHistory = () => {
     ]
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             if (user) {
                 const meetings = (await getAppointmentsFor(user.uid))
                     .filter((value) => JSON.stringify(value) !== "{}")
+                    .filter((meeting) => new Date(meeting.date) < new Date())
                     .map(async ({ uid, date, meetingLink, submission }) => ({
                         date,
                         doctor: await getFullNameById(uid),

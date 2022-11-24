@@ -3,86 +3,21 @@ import { Card } from "antd"
 import { Badge, Modal, Tag, Calendar, Button } from "antd"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { getNextApt } from "../../lib/utils"
-
-const getListData = (value) => {
-    let listData
-    switch (value.date()) {
-        case 20:
-            listData = [
-                {
-                    content: "Coughing examination",
-                    time: "6:30",
-                    link: "link",
-                },
-                {
-                    content: "General medical checkup for nausea",
-                    time: "6:30",
-                    link: "link",
-                },
-            ]
-            break
-        default:
-    }
-    return listData || []
-}
-
-const PatientCalendar = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [events, setEvents] = useState([])
-
-    const dateCellRender = (value) => {
-        const listData = getListData(value)
-        return (
-            <ul
-                className="events p-0 flex flex-col gap-1"
-                onClick={() => {
-                    setEvents(listData)
-                    setIsModalOpen(true)
-                }}
-            >
-                {listData.map((item) => (
-                    <li key={item.content} className="">
-                        <Tag color="blue">{item.content}</Tag>
-                    </li>
-                ))}
-            </ul>
-        )
-    }
-    return (
-        <>
-            <Calendar dateCellRender={dateCellRender} className="rounded" />
-            <Modal
-                title="Appointments"
-                open={isModalOpen}
-                onOk={() => setIsModalOpen(false)}
-                onCancel={() => setIsModalOpen(false)}
-            >
-                <ul className="flex flex-col gap-2">
-                    {events.map((item) => (
-                        <li key={item.content}>
-                            <p className="mb-2">
-                                {item.content} at {item.time}
-                            </p>
-                            <Link href={item.link}>
-                                <Button type="primary">Join Now</Button>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </Modal>
-        </>
-    )
-}
+import { getAppointmentsFor, getNextApt } from "../../lib/utils"
+import { EventCalendar } from "../../components/EventCalendar"
 
 export default function Patient() {
     const [nextApt, setNextApt] = useState({})
+    const [allApt, setAllApt] = useState([])
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const apt = await getNextApt()
             setNextApt(apt)
+
+            const apts = await getAppointmentsFor("running")
+            setAllApt(apts)
         })()
-    })
+    }, [])
     return (
         <Layout>
             {nextApt ? (
@@ -124,7 +59,7 @@ export default function Patient() {
                 </Link>
             </div>
             <div className="my-10 max-w-7xl m-auto">
-                <PatientCalendar />
+                <EventCalendar events={allApt} />
             </div>
         </Layout>
     )

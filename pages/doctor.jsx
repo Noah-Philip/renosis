@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import { Layout } from "../../components/Layout"
+import { Layout } from "../components/Layout"
 import {
     Table,
     Button,
     Modal,
     Tag,
+    Form,
     Calendar,
     DatePicker,
     TimePicker,
@@ -12,9 +13,9 @@ import {
 } from "antd"
 import Link from "next/link"
 import { v4 as uuidv4 } from "uuid"
-import { useFirebaseAuth } from "../../lib/auth-context"
+import { useFirebaseAuth } from "../lib/auth-context"
 import { getFirestore, doc, setDoc } from "firebase/firestore"
-import { firebaseConfig } from "../../lib/config"
+import { firebaseConfig } from "../lib/config"
 import { initializeApp } from "firebase/app"
 import {
     getAllSubmissions,
@@ -22,77 +23,8 @@ import {
     getFullNameById,
     textTo,
     getPhoneNumber,
-} from "../../lib/utils"
-
-const getListData = (value) => {
-    let listData
-    switch (value.date()) {
-        case 20:
-            listData = [
-                {
-                    content: "Coughing examination",
-                    time: "6:30",
-                    link: "link",
-                },
-                {
-                    content: "General medical checkup for nausea",
-                    time: "6:30",
-                    link: "link",
-                },
-            ]
-            break
-        default:
-    }
-    return listData || []
-}
-
-const DoctorCalendar = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false)
-    const [events, setEvents] = useState([])
-
-    const dateCellRender = (value) => {
-        const listData = getListData(value)
-        return (
-            <ul
-                className="events p-0 flex flex-col gap-1"
-                onClick={() => {
-                    setEvents(listData)
-                    setIsModalOpen(true)
-                }}
-            >
-                {listData.map((item) => (
-                    <li key={item.content} className="">
-                        <Tag color="blue">{item.content}</Tag>
-                    </li>
-                ))}
-            </ul>
-        )
-    }
-    return (
-        <>
-            <Calendar dateCellRender={dateCellRender} className="rounded" />
-            <Modal
-                title="Appointments"
-                open={isModalOpen}
-                onOk={() => setIsModalOpen(false)}
-                onCancel={() => setIsModalOpen(false)}
-            >
-                <ul className="flex flex-col gap-2">
-                    {events.map((item) => (
-                        <li key={item.content}>
-                            <p className="mb-2">
-                                {item.content} at {item.time}
-                            </p>
-                            <Link href={item.link}>
-                                <Button type="primary">Join Now</Button>
-                            </Link>
-                        </li>
-                    ))}
-                </ul>
-            </Modal>
-        </>
-    )
-}
+} from "../lib/utils"
+import { EventCalendar } from "../components/EventCalendar"
 
 export default function Doctor() {
     const user = useFirebaseAuth()
@@ -102,11 +34,9 @@ export default function Doctor() {
     const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false)
     const [currRecord, setCurrRecord] = useState({})
     const [currText, setCurrText] = useState("")
-    const [date, setDate] = useState("")
-    const [time, setTime] = useState("")
     const [subData, setSubData] = useState([])
     const [meetingData, setMeetingData] = useState([])
-    const [meetingLink, setMeetingLink] = useState("")
+    const [form] = Form.useForm()
 
     const meetingColumns = [
         {
@@ -130,11 +60,6 @@ export default function Doctor() {
     ]
 
     const subColumns = [
-        // {
-        //     title: "Title",
-        //     dataIndex: "title",
-        //     key: "title",
-        // },
         {
             title: "Patient",
             dataIndex: "patient",
@@ -187,7 +112,7 @@ export default function Doctor() {
     ]
 
     useEffect(() => {
-        ; (async () => {
+        ;(async () => {
             const subs = (await getAllSubmissions())
                 .filter((value) => JSON.stringify(value) !== "{}")
                 .map(async ({ date, text, time, uid, vid }) => ({
@@ -203,19 +128,13 @@ export default function Doctor() {
             if (user) {
                 const meetings = (await getAppointmentsBy(user.uid))
                     .filter((value) => JSON.stringify(value) !== "{}")
-                    .map(
-                        async ({
-                            date,
-                            meetingLink,
-                            submission,
-                            ...others
-                        }) => ({
-                            date,
-                            patient: submission.patient,
-                            meetingLink,
-                            ...others,
-                        })
-                    )
+                    .map(async ({ date, meetingLink, submission,...others }) => ({
+                        date,
+                        patient: submission.patient,
+                        submission,
+                        meetingLink,
+                        ...others,
+                    }))
                 setMeetingData(await Promise.all(meetings))
             }
         })()
@@ -233,7 +152,7 @@ export default function Doctor() {
             </div>
             <div className="my-10 mt-16 max-w-7xl m-auto">
                 <h1>Calendar</h1>
-                <DoctorCalendar />
+                <EventCalendar events={meetingData} />
             </div>
             <Modal
                 title="Description"
@@ -246,43 +165,59 @@ export default function Doctor() {
             <Modal
                 title="Schedule Appointment"
                 open={isScheduleModalOpen}
-                onOk={async () => {
-                    // submit
-                    const id = uuidv4()
-                    const obj = {
-                        id,
-                        uid: user.uid,
-                        submission: currRecord,
-                        date,
-                        time,
-                        meetingLink,
-                    }
-                    await setDoc(doc(db, "appointments", id), obj)
+                onOk={form.submit}
+                onCancel={() => {
                     setIsScheduleModalOpen(false)
-                    await textTo(
-                        await getPhoneNumber(currRecord.uid),
-                        `Renosis Reminder: Appointment scheduled for ${date} at ${time}. Meeting link: ${meetingLink}`
-                    )
+                    form.resetFields()
                 }}
-                onCancel={() => setIsScheduleModalOpen(false)}
             >
-                <Input
-                    placeholder="Google Meets link"
-                    className="mb-4"
-                    onChange={(txt) => setMeetingLink(txt.target.value)}
-                />
-                <div className="flex gap-2 mb-4">
-                    <DatePicker
-                        onChange={(date, dateString) => {
-                            setDate(dateString)
-                        }}
-                    />
-                    <TimePicker
-                        onChange={(time, timeString) => {
-                            setTime(timeString)
-                        }}
-                    />
-                </div>
+                <Form
+                    form={form}
+                    onFinish={async (values) => {
+                        setIsScheduleModalOpen(false)
+
+                        const id = uuidv4()
+                        const obj = {
+                            id,
+                            uid: user.uid,
+                            submission: currRecord,
+                            date: values.date.format("YYYY-MM-DD"),
+                            time: values.time.format("HH-mm:ss"),
+                            meetingLink: values.link,
+                        }
+                        await setDoc(doc(db, "appointments", id), obj)
+                        form.resetFields()
+                        // await textTo(
+                        //     await getPhoneNumber(currRecord.uid),
+                        //     `Renosis Reminder: Appointment scheduled for ${date} at ${time}. Meeting link: ${meetingLink}`
+                        // )
+                    }}
+                >
+                    <Form.Item
+                        name="link"
+                        className="mt-4"
+                        rules={[
+                            {
+                                required: true,
+                                message: "Please input the Google Meets link!",
+                            },
+                        ]}
+                    >
+                        <Input placeholder="Google Meets link" />
+                    </Form.Item>
+                    <div className="flex gap-2 mb-4">
+                        <Form.Item name="date">
+                            <DatePicker
+                                disabledDate={(date) =>
+                                    date < new Date().setHours(0, 0, 0, 0)
+                                }
+                            />
+                        </Form.Item>
+                        <Form.Item name="time">
+                            <TimePicker />
+                        </Form.Item>
+                    </div>
+                </Form>
             </Modal>
         </Layout>
     )

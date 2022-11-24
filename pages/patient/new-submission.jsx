@@ -87,6 +87,7 @@ export default function NewSubmission() {
                     placeholder="Enter a short description of your video and symptoms here"
                     onChange={(event) => setText(event.target.value)}
                     className="mb-4"
+                    required={true}
                 />
                 <div className="mb-4">
                     <Dragger {...{ ...props, fileList: progress }}>
@@ -105,6 +106,9 @@ export default function NewSubmission() {
                 <div className="flex gap-2 mb-4">
                     <DatePicker
                         placeholder="Preferred Date"
+                        disabledDate={(date) =>
+                            date < new Date().setHours(0, 0, 0, 0)
+                        }
                         onChange={(date, dateString) => {
                             setDate(dateString)
                         }}
