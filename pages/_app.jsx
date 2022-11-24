@@ -1,25 +1,18 @@
 import { FirebaseAuthProvider } from "../lib/auth-context"
 import React from "react"
 import "../styles/globals.css"
-/* import Router from "next/router"
+import Router from "next/router"
 import { initializeApp } from "firebase/app"
 import { firebaseConfig } from "../lib/config"
 import { getAuth } from "firebase/auth"
-import { useEffect } from "react"
-import { getUserRole } from "../lib/utils" */
+import { getUserRole } from "../lib/utils"
 
 function MyApp({ Component, pageProps }) {
-    /* const app = initializeApp(firebaseConfig)
+    const app = initializeApp(firebaseConfig)
     const auth = getAuth(app)
-    const [user, setUser] = React.useState(null)
 
     React.useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged(setUser)
-        return unsubscribe
-    }, []) */
-
-    /* useEffect(() => {
-        ;(async () => {
+        const unsubscribe = auth.onAuthStateChanged(async (user) => {
             const role = await getUserRole(user)
             if (
                 pageProps.protected &&
@@ -31,9 +24,10 @@ function MyApp({ Component, pageProps }) {
                     Router.push("/")
                 }
             }
-        })()
-    }, [user])
- */
+        })
+        return unsubscribe
+    }, [])
+
     return (
         <FirebaseAuthProvider>
             <Component {...pageProps} />

@@ -9,7 +9,7 @@ export default function Home() {
                         src="/images/landingbg.png"
                         alt="background"
                         className="opacity-20"
-                        width = "100%"
+                        width="100%"
                     />
                 </div>
                 <div className="z-10 text-center pt-10">

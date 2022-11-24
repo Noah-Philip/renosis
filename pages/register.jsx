@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react"
-import { Button, Select, Option, Radio, Form, Input } from "antd"
+import { Button, Select, Option, Radio, Form, Input, message } from "antd"
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 import { getFirestore, doc, addDoc, setDoc } from "firebase/firestore"
@@ -30,7 +30,6 @@ export const Register = () => {
             .catch((error) => {
                 const errorCode = error.code
                 const errorMessage = error.message
-                console.error(error)
             })
     }
 
@@ -107,8 +106,8 @@ export const Register = () => {
                         },
                         {
                             pattern: /^\+?[1-9]\d{1,14}$/,
-                            message: "Must be in E.164 format"
-                        }
+                            message: "Must be in E.164 format",
+                        },
                     ]}
                 >
                     <Input />
@@ -124,7 +123,7 @@ export const Register = () => {
                         },
                         {
                             min: 6,
-                            message: "Must have a minimum of 6 characters"
+                            message: "Must have a minimum of 6 characters",
                         },
                     ]}
                 >
@@ -134,19 +133,24 @@ export const Register = () => {
                 <Form.Item
                     label="Confirm Password"
                     name="confirmpassword"
-                    dependencies={['password']}
+                    dependencies={["password"]}
                     hasFeedback
                     rules={[
                         {
                             required: true,
-                            message: 'Please confirm your password!',
+                            message: "Please confirm your password!",
                         },
                         ({ getFieldValue }) => ({
                             validator(_, value) {
-                                if (!value || getFieldValue('password') === value) {
-                                    return Promise.resolve();
+                                if (
+                                    !value ||
+                                    getFieldValue("password") === value
+                                ) {
+                                    return Promise.resolve()
                                 }
-                                return Promise.reject(new Error("Passwords don't match!"));
+                                return Promise.reject(
+                                    new Error("Passwords don't match!")
+                                )
                             },
                         }),
                     ]}
@@ -185,3 +189,12 @@ export const Register = () => {
     )
 }
 export default Register
+
+export async function getStaticProps(context) {
+    return {
+        props: {
+            protected: false,
+            userTypes: [],
+        },
+    }
+}

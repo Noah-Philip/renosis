@@ -1,5 +1,5 @@
 import React from "react"
-import { Button, Checkbox, Form, Input } from "antd"
+import { Button, Checkbox, Form, Input, message } from "antd"
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth"
 import { initializeApp } from "firebase/app"
 import { Layout } from "../components/Layout"
@@ -23,6 +23,7 @@ export const Login = () => {
                 const errorCode = error.code
                 const errorMessage = error.message
                 console.log(error)
+                message.error("Unable to login: Invalid credentials")
             })
     }
 
@@ -86,4 +87,14 @@ export const Login = () => {
         </Layout>
     )
 }
+
 export default Login
+
+export async function getStaticProps(context) {
+    return {
+        props: {
+            protected: false,
+            userTypes: [],
+        },
+    }
+}

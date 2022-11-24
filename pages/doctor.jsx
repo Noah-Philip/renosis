@@ -10,6 +10,7 @@ import {
     DatePicker,
     TimePicker,
     Input,
+    message,
 } from "antd"
 import Link from "next/link"
 import { v4 as uuidv4 } from "uuid"
@@ -126,15 +127,15 @@ export default function Doctor() {
             setSubData(await Promise.all(subs))
 
             if (user) {
-                const meetings = (await getAppointmentsBy(user.uid))
-                    .filter((value) => JSON.stringify(value) !== "{}")
-                    .map(async ({ date, meetingLink, submission,...others }) => ({
+                const meetings = (await getAppointmentsBy(user.uid)).map(
+                    async ({ date, meetingLink, submission, ...others }) => ({
                         date,
                         patient: submission.patient,
                         submission,
                         meetingLink,
                         ...others,
-                    }))
+                    })
+                )
                 setMeetingData(await Promise.all(meetings))
             }
         })()
@@ -187,10 +188,12 @@ export default function Doctor() {
                         }
                         await setDoc(doc(db, "appointments", id), obj)
                         form.resetFields()
-                        // await textTo(
-                        //     await getPhoneNumber(currRecord.uid),
-                        //     `Renosis Reminder: Appointment scheduled for ${date} at ${time}. Meeting link: ${meetingLink}`
-                        // )
+                        await textTo(
+                            await getPhoneNumber(currRecord.uid),
+                            `Renosis Reminder: Appointment scheduled for ${date} at ${time}. Meeting link: ${meetingLink}`
+                        )
+                        message.success("Successfully created appointment")
+                        setMeetingData([...meetingData, obj])
                     }}
                 >
                     <Form.Item

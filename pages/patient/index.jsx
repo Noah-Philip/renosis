@@ -5,19 +5,25 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { getAppointmentsFor, getNextApt } from "../../lib/utils"
 import { EventCalendar } from "../../components/EventCalendar"
+import { useFirebaseAuth } from "../../lib/auth-context"
 
 export default function Patient() {
     const [nextApt, setNextApt] = useState({})
     const [allApt, setAllApt] = useState([])
+    const user = useFirebaseAuth()
+
     useEffect(() => {
         ;(async () => {
-            const apt = await getNextApt()
-            setNextApt(apt)
+            if (user) {
+                const apt = await getNextApt(user.uid)
+                setNextApt(apt)
 
-            const apts = await getAppointmentsFor("running")
-            setAllApt(apts)
+                const apts = await getAppointmentsFor(user.uid)
+                setAllApt(apts)
+            }
         })()
-    }, [])
+    }, [user])
+
     return (
         <Layout>
             {nextApt ? (
@@ -32,7 +38,7 @@ export default function Patient() {
                         <h1>
                             Next appointment on {nextApt.date} at {nextApt.time}
                         </h1>
-                        <Link href="">
+                        <Link href={nextApt.meetingLink || ""}>
                             <Button type="primary">Join Now</Button>
                         </Link>
                     </Card>

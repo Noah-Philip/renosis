@@ -66,7 +66,6 @@ export default function NewSubmission() {
                     console.error(error)
                 },
                 () => {
-                    console.log(progress)
                     getDownloadURL(task.snapshot.ref).then((url) => {
                         setVid({ url, name: uuid })
                     })
@@ -134,8 +133,8 @@ export default function NewSubmission() {
                             time,
                             createdAt: now,
                         }
-                        console.log(obj)
                         await setDoc(doc(db, "submissions", vid.name), obj)
+                        Router.push("/patient")
                     }}
                 >
                     Submit

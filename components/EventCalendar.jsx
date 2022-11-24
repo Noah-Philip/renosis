@@ -1,5 +1,6 @@
-import {useState} from "react"
+import { useState } from "react"
 import { Modal, Tag, Calendar, Button } from "antd"
+import Link from "next/link"
 
 export const EventCalendar = ({ events }) => {
     const [isModalOpen, setIsModalOpen] = useState(false)

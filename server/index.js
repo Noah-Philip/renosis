@@ -15,11 +15,10 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 
 app.post("/text", (req, res) => {
-    console.log(req.body)
     const { phone, msg } = req.body
     client.messages
         .create({ body: msg, from: "+12057976004", to: phone })
-        .then((message) => console.log(message.sid))
+        .then((message) => `Sent ${message.sid}`)
 })
 
 app.listen(8080, () => {
